@@ -8,8 +8,9 @@
     .tableFixed{
         position: absolute;
         top: 0;
-        bottom: 0;
+        bottom: 16px;
         z-index: 9;
+        background-color: #fff;
         &.leftSide {
             left: 0;
             border-right: 1px solid #ccc;
@@ -18,18 +19,23 @@
             right: 0;
             border-left: 1px solid #ccc;
         }
-        .tableBody{
-            border-bottom: 16px solid rgba(0, 0, 0, 0);
-            &::-webkit-scrollbar {
-                display: none;
+        .table{
+            overflow: hidden;
+            .tableBody{
+                &::-webkit-scrollbar {
+                    display: none;
+                }
+                scrollbar-width: none;
+                
             }
-            scrollbar-width: 6px;
-            .viewItem{
+            .tableHeader, .tableFooter {
                 background-color: #fff;
             }
         }
-        .tableHeader, .tableFooter {
-            background-color: #fff;
+    }
+    .mainTable{
+        .tableHeader {
+            border-right: 16px solid transparent;
         }
     }
     .table{
@@ -68,7 +74,7 @@
         }
         .tableBody{
             overflow: auto;
-            height: 510px;
+            height: 538px;
             position: relative;
             box-sizing: border-box;
         }
