@@ -1,0 +1,12 @@
+/lambda/
+/scripts
+/config
+.history
+/dist
+/node_modules
+.umi
+.github
+vv-frontend-components
+oaicons
+.svg
+/src/pages/WorkFlow/components/Upload/
