@@ -10,3 +10,4 @@ vv-frontend-components
 oaicons
 .svg
 /src/pages/WorkFlow/components/Upload/
+yarn-error.log
