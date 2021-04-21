@@ -52,11 +52,7 @@ const CustomTable = (props) => {
     const mainTableBody = virtualList.current;
     const leftTableBody = leftVirtualList.current;
 
-    const headerScrollFn = () => {
-      if (headerTableBody.scrollLeft !== mainTableBody.scrollLeft) {
-        mainTableBody.scrollLeft = headerTableBody.scrollLeft;
-      }
-    };
+    
 
     const updateViewContentFn = () => {
       const clientHeight = mainTableBody.clientHeight;
@@ -80,9 +76,17 @@ const CustomTable = (props) => {
 
     const updateViewContent = updateViewContentFn();
 
+    const headerScrollFn = () => {
+      if (headerTableBody.scrollLeft !== mainTableBody.scrollLeft) {
+        mainTableBody.scrollLeft = headerTableBody.scrollLeft;
+      }
+    };
+
     const leftHandleScroll = (e) => {
-      mainTableBody.scrollTop = e.target.scrollTop;
-      updateViewContent(e.target.scrollTop);
+      if (mainTableBody.scrollTop !== e.target.scrollTop) {
+        mainTableBody.scrollTop = e.target.scrollTop;
+        updateViewContent(e.target.scrollTop);
+      }
     };
 
     const handleScroll = (e) => {
@@ -93,8 +97,8 @@ const CustomTable = (props) => {
         headerTableBody.scrollLeft = e.target.scrollLeft;
       }
       if (leftTableBody && leftTableBody.scrollTop !== e.target.scrollTop) {
-        updateViewContent(e.target.scrollTop);
         leftTableBody.scrollTop = e.target.scrollTop;
+        updateViewContent(e.target.scrollTop);
       }
     };
 

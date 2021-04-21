@@ -12,11 +12,6 @@ export function getRoutes() {
     "component": require('@/pages/index.js').default
   },
   {
-    "path": "/table copy",
-    "exact": true,
-    "component": require('@/pages/table copy.js').default
-  },
-  {
     "path": "/table",
     "exact": true,
     "component": require('@/pages/table.js').default

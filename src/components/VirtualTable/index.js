@@ -1,195 +1,156 @@
-import TableCell from "./tableCell";
+import React, { useState, useEffect, useMemo } from "react";
 import { Table } from "antd";
-export default class VirtualTable extends React.Component {
-  static itemH = 30;
-  constructor(props) {
-    super(props);
-    // 可视区域dom结构
-    this.virtualList = React.createRef();
-    this.virtualHeader = React.createRef();
-    this.virtualFooter = React.createRef();
-    this.leftVirtualList = React.createRef();
-    // 计算总高度
-    console.warn(props);
-    const { columns, dataSource, height } = props;
-    const totalH = dataSource.length * VirtualTable.itemH + "px";
-    this.state = {
-      dataSource,
-      columns,
-      data: [], // 可视区域数据
-      index: 0, // 可视区域最初索引
-      totalHeight: totalH, // 长列表总高度 列表中每一项数据高度总和
-      transform: "",
-      scrollLeft: 0,
-    };
-  }
+import style from "./table.less";
+import classnames from "classnames";
+import { useMount } from "react-use";
 
-  componentDidMount() {
-    this.updateViewContent();
-  }
+import TableCell from "../TableCell";
 
-  handleScroll = (e) => {
-    /*
-     * 获取scrollTop
-     * 此属性可以获取或者设置对象的最顶部到对象在当前窗口显示的范围内的顶边的距离
-     * 也就是元素滚动条被向下拉动的距离
-     * */
-    console.log(e.target.scrollLeft);
-    const headerBox = this.virtualHeader.current.querySelector(
-      ".ant-table-body"
-    );
-    const footerBox = this.virtualFooter.current;
-    const leftVirtualBox = this.leftVirtualList?.current;
-    if (leftVirtualBox) {
-      leftVirtualBox.scrollTop = e.target.scrollTop;
-    }
-    headerBox.scrollLeft = e.target.scrollLeft;
-    footerBox.scrollLeft = e.target.scrollLeft;
-    this.updateViewContent(e.target.scrollTop, e.target.scrollLeft);
+export default VirtualTable = ({ columns = [], dataSource = [], height, rowHeight = 30 }) => {
+
+  const [totalH, setTotalH] = React.useState(0);
+  
+
+  const [dataList, setDataList] = useState([]);
+  const [columnsList, setColumnsList] = useState(columns);
+  const [leftColumns, setLeftColumns] = useState([]);
+
+  // 设置滚动区域高度
+  useEffect(() => {
+    setTotalH(rowHeight * dataSource.length);
+  }, [rowHeight, dataSource]);
+
+  //数据初始化
+  const newDataSource = useMemo(function () {
+    return dataSource.map((item, index) => {
+      return {
+        ...item,
+        transform: index * rowHeight
+      }
+    })
+  }, [dataSource])
+
+  // 可视区域dom结构
+  const virtualList = React.createRef();
+  const virtualHeader = React.createRef();
+  const leftVirtualList = React.createRef();
+
+  // 头部columns
+  useEffect(() => {
+    setLeftColumns(columnsList.filter((item) => item.fixed));
+  }, [columnsList]);
+
+  // 表单行高样式
+  const itemStyle = {
+    height: rowHeight,
+    lineHeight: `${rowHeight}px`,
   };
 
-  leftHandleScroll = (e) => {
-    /*
-     * 获取scrollTop
-     * 此属性可以获取或者设置对象的最顶部到对象在当前窗口显示的范围内的顶边的距离
-     * 也就是元素滚动条被向下拉动的距离
-     * */
+  // 核心
+  useMount(() => {
+    const headerTableBody = virtualHeader.current;
+    const mainTableBody = virtualList.current;
+    const leftTableBody = leftVirtualList.current;
 
-    const virtualBox = this.virtualList?.current;
-    if (virtualBox) {
-      virtualBox.scrollTop = e.target.scrollTop;
-    }
-    this.updateViewContent(e.target.scrollTop);
-  };
+    const updateViewContentFn = () => {
+      const clientHeight = mainTableBody.clientHeight;
+      // 计算可视区域里能放几个元素
+      const viewCount = Math.ceil(clientHeight / rowHeight);
 
-  updateViewContent = (scrollTop = 0, scrollLeft = 0) => {
-    // 计算可视区域里能放几个元素
-    const viewCount = Math.ceil(
-      this.virtualList.current.clientHeight / VirtualTable.itemH
-    );
-    // 计算可视区域开始的索引
-    const start = Math.floor(scrollTop / VirtualTable.itemH);
-    // 计算可视区域结束索引
-    const end = start + viewCount;
-    // 截取可视区域数据
-    const viewData = this.state.dataSource.slice(start, end);
+      const halfViewCount = Math.ceil(viewCount / 2);
 
-    this.setState({
-      data: viewData,
-      index: start,
-      scrollLeft,
-      // 把可见区域的 top 设置为起始元素在整个列表中的位置
-      transform: `translate3d(0, ${start * VirtualTable.itemH}px, 0)`,
-    });
-  };
+      return function (scrollTop = 0) {
+        // 计算可视区域开始的索引
+        const initStart = Math.floor(scrollTop / rowHeight);
+        const start = initStart > viewCount ? initStart - halfViewCount : 0;
+        // 计算可视区域结束索引
+        const end = start + viewCount * 2;
+        // 截取可视区域数据
+        const viewData = newDataSource.slice(start, end);
 
-  render() {
-    const { totalHeight, transform, data, columns, index } = this.state;
-    console.log(data);
-    console.log(index);
-
-    const initColumns = (data) => {
-      return data.map((item) => {
-        if (item.children) {
-          item.children = initColumns(item.children);
-        }
-        item.width = item.width ? item.width : 150;
-        return item;
-      });
+        setDataList(viewData);
+      };
     };
 
-    const newColumns = initColumns(columns);
+    const updateViewContent = updateViewContentFn();
 
-    // const leftFixedColumns = newColumns.filter((item) => item.fixed);
-    // const leftNoFixedColumns = leftFixedColumns.slice().map((item) => {
-    //   item.fixed = false;
-    //   return item;
-    // });
-    // const containerFixedColumns = newColumns.filter((item) => !item.fixed);
+    const headerScrollFn = () => {
+      if (headerTableBody.scrollLeft !== mainTableBody.scrollLeft) {
+        mainTableBody.scrollLeft = headerTableBody.scrollLeft;
+      }
+    };
 
-    // console.log(leftFixedColumns);
-    console.log(newColumns);
-    const footerData = data.slice(0, 1);
+    const leftHandleScroll = (e) => {
+      if (mainTableBody.scrollTop !== e.target.scrollTop) {
+        mainTableBody.scrollTop = e.target.scrollTop;
+        updateViewContent(e.target.scrollTop);
+      }
+    };
 
-    return (
-      <div className="virtual-body">
-        {/* <div className="virtual-side">
-          <div className="virtual-header" style={{ height: "56px" }}>
-            <Table
-              columns={leftFixedColumns}
-              pagination={false}
-              dataSource={[{}]}
-              scroll={{ x: "max-content" }}
-            />
-          </div>
-          <div
-            className="virtual-list"
-            // onScroll={this.leftHandleScroll}
-            ref={this.leftVirtualList}
-          >
-            <div
-              className="virtual-list-height"
-              style={{ height: totalHeight }}
-            />
-            <div className="view-content" style={{ transform: transform }}>
-              {data.map((item) => (
-                <div className="view-item">
-                  <TableCell
-                    data={item}
-                    columns={leftFixedColumns}
-                    key={"left" + item.id}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="virtual-footer" style={{ height: "56px" }}>
-            <Table
-              columns={leftFixedColumns}
-              pagination={false}
-              dataSource={[{}]}
-              scroll={{ x: "max-content" }}
-            />
-          </div>
-        </div> */}
-        <div className="virtual-main">
-          <div className="virtual-header" ref={this.virtualHeader}>
-            <Table
-              columns={newColumns}
-              pagination={false}
-              dataSource={[{}]}
-              scroll={{ x: "max-content" }}
-            />
-          </div>
-          <div
-            className="virtual-list"
-            onScroll={this.handleScroll}
-            ref={this.virtualList}
-          >
-            <div
-              className="virtual-list-height"
-              style={{ height: totalHeight }}
-            />
-            <div className="view-content" style={{ transform: transform }}>
-              {data.map((item) => (
-                <div className="view-item">
-                  <TableCell data={item} columns={newColumns} key={item.id} />
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="virtual-footer" ref={this.virtualFooter}>
-            <div>
-              {footerData.map((item) => (
-                <div className="view-item">
-                  <TableCell data={item} columns={newColumns} key={item.id} />
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-        {/* <div className="virtual-side-right"></div> */}
-      </div>
-    );
-  }
+    const handleScroll = (e) => {
+      if (
+        headerTableBody &&
+        headerTableBody.scrollLeft !== e.target.scrollLeft
+      ) {
+        headerTableBody.scrollLeft = e.target.scrollLeft;
+      }
+      if (leftTableBody && leftTableBody.scrollTop !== e.target.scrollTop) {
+        leftTableBody.scrollTop = e.target.scrollTop;
+        updateViewContent(e.target.scrollTop);
+      }
+    };
+
+    // 头部scroll监听
+    const headerMouseFn = () => {
+      mainTableBody.removeEventListener("scroll", handleScroll);
+      leftTableBody.removeEventListener("scroll", leftHandleScroll);
+      headerTableBody.addEventListener("scroll", headerScrollFn);
+    };
+
+    // 主体scroll监听
+    const mainMouseFn = () => {
+      headerTableBody.removeEventListener("scroll", headerScrollFn);
+      leftTableBody.removeEventListener("scroll", leftHandleScroll);
+      mainTableBody.addEventListener("scroll", handleScroll);
+    };
+
+    // 左侧fixed scroll监听
+    const leftMouseFn = () => {
+      headerTableBody.removeEventListener("scroll", headerScrollFn);
+      mainTableBody.removeEventListener("scroll", handleScroll);
+      leftTableBody.addEventListener("scroll", leftHandleScroll);
+    };
+
+    headerTableBody.addEventListener("mouseover", headerMouseFn);
+    mainTableBody.addEventListener("mouseover", mainMouseFn);
+    leftTableBody.addEventListener("mouseover", leftMouseFn);
+    mainTableBody.scrollTop = 0
+    leftTableBody.scrollTop = 0
+    updateViewContent(mainTableBody.scrollTop);
+
+    return () => {
+      headerTableBody.removeEventListener("mouseover", headerMouseFn);
+      mainTableBody.removeEventListener("mouseover", mainMouseFn);
+      leftTableBody.removeEventListener("mouseover", leftMouseFn);
+    };
+  });
+
+  // 头部行数
+  const rowSpan = useMemo(function () {
+    const columnsChild = columnsList.filter((item) => item.children);
+    return columnsChild.length > 0 ? 2 : 1;
+  }, [columnsList])
+
+  // 头部第二行Cell
+  const HeaderCell = ({ childColumns }) => {
+    return childColumns.map((item) => (
+      <th key={item.dataIndex}>
+        <div style={{ width: item.width || 120 }}>{item.title}</div>
+      </th>
+    ));
+  };
+
+  return (
+    <div>1111</div>
+  )
 }
