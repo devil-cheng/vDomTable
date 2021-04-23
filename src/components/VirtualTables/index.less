@@ -1,0 +1,92 @@
+.scrollBarHidden{
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+.scrollBarCustom{
+    &::-webkit-scrollbar{
+        width: 6px;
+        height: 4px;
+        border-radius: 3px;
+    }
+    &::-webkit-scrollbar-track{
+        background-color:#f8f8f8;
+    }
+    &::-webkit-scrollbar-thumb{
+        background-color:#ddd;
+        border-radius: 4px;
+    }
+}
+
+.container{
+    max-height: 700px;
+    overflow: hidden;
+    border: 1px solid #e8e8e8;
+    .header{
+        border-bottom: 1px solid #e8e8e8;
+        border-color: #e8e8e8;
+        border-right-style: solid;
+        position: relative;
+        .headerContainer{
+            overflow-x: auto;
+            .scrollBarHidden;
+            .leftFixed{
+                position: absolute;
+                background-color: #fff;
+            }
+            .table {
+                border-spacing: 0;
+                border: 1px solid #e8e8e8;
+                border-color: #e8e8e8;
+                th,td{
+                    text-align: center;
+                    vertical-align: middle;
+                    overflow: hidden;
+                    word-break: break-all;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                    padding: 3px 6px;
+                    border: 1px solid #e8e8e8;
+                    box-sizing: border-box;
+                    height: 30px;
+                }
+            }
+        }
+
+    }
+    .tbodyContainer{
+        position: relative;
+        height: 500px;
+        
+        .tableBody{
+            overflow: auto;
+            height: 400px;
+            position: relative;
+            box-sizing: border-box;
+            width: 100%;
+            .scrollBarCustom;
+            .virtualListHeight {
+                position: absolute;
+                left: 0;
+                top: 0;
+                right: 0;
+                z-index: -1;
+            }
+        }
+        .leftFixedTbody{
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 9;
+            background-color: #fff;
+            border-right: 1px solid #e8e8e8;
+            .tableBody{
+                overflow-x: hidden;
+                .scrollBarHidden;
+            }
+        }
+    }
+
+}

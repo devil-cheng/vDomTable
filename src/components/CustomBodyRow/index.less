@@ -1,0 +1,35 @@
+.tableBody{
+    overflow: auto;
+    height: 400px;
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    &::-webkit-scrollbar{
+        width: 6px;
+        height: 4px;
+        border-radius: 3px;
+    }
+    &::-webkit-scrollbar-track{
+        background-color:#f8f8f8;
+    }
+    &::-webkit-scrollbar-thumb{
+        background-color:#ddd;
+        border-radius: 4px;
+    }
+    .virtualListHeight {
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        z-index: -1;
+    }
+}
+.leftFixedTbody{
+    .tableBody{
+        overflow: hidden;
+        &::-webkit-scrollbar {
+            display: none;
+        }
+        scrollbar-width: none;
+    }
+}

@@ -3,16 +3,15 @@ import style from "./table.less";
 import classnames from "classnames";
 import { useMount } from "react-use";
 
-import data from "../components/data";
-import TableCell from "../components/TableCell/index";
+import TableRow from "../TableRow";
+import TableHeader from "../TableHeader";
 
-const CustomTable = (props) => {
-  const { height = 500, rowHeight = 30, dataSource = data.salaryList } = props;
+const VirtualTable = ({ columns = [], dataSource = [], height, rowHeight = 30 }) => {
 
   const [totalH, setTotalH] = React.useState(0);
 
   const [dataList, setDataList] = useState([]);
-  const [columns, setColumns] = useState([]);
+  const [columnsList, setColumnsList] = useState(columns);
   const [leftColumns, setLeftColumns] = useState([]);
 
   // 设置滚动区域高度
@@ -30,15 +29,15 @@ const CustomTable = (props) => {
     })
   }, [dataSource])
 
+  // 可视区域dom结构
   const virtualList = React.createRef();
   const virtualHeader = React.createRef();
   const leftVirtualList = React.createRef();
 
   // 头部columns
   useEffect(() => {
-    setColumns(data.headList);
-    setLeftColumns(data.headList.filter((item) => item.fixed));
-  }, []);
+    setLeftColumns(columnsList.filter((item) => item.fixed));
+  }, [columnsList]);
 
   // 表单行高样式
   const itemStyle = {
@@ -52,10 +51,8 @@ const CustomTable = (props) => {
     const mainTableBody = virtualList.current;
     const leftTableBody = leftVirtualList.current;
 
-    
-
     const updateViewContentFn = () => {
-      const clientHeight = mainTableBody.clientHeight;
+      const clientHeight = mainTableBody && mainTableBody.clientHeight;
       // 计算可视区域里能放几个元素
       const viewCount = Math.ceil(clientHeight / rowHeight);
 
@@ -139,9 +136,9 @@ const CustomTable = (props) => {
 
   // 头部行数
   const rowSpan = useMemo(function () {
-    const columnsChild = columns.filter((item) => item.children);
+    const columnsChild = columnsList.filter((item) => item.children);
     return columnsChild.length > 0 ? 2 : 1;
-  }, [columns])
+  }, [columnsList])
 
   // 头部第二行Cell
   const HeaderCell = ({ childColumns }) => {
@@ -157,84 +154,31 @@ const CustomTable = (props) => {
       <div className={classnames(style.tableFixed, style.leftSide)}>
         <div className={style.table}>
           <div className={style.tableHeader}>
-            <table border="1">
-              <tbody>
-                <tr style={{ height: 60 }}>
-                  {leftColumns.map((item) => (
-                    <th
-                      rowSpan={item.children ? 1 : rowSpan}
-                      key={item.dataIndex}
-                    >
-                      <div style={{ width: item.width || 120 }}>
-                        {item.title}
-                      </div>
-                    </th>
-                  ))}
-                </tr>
-              </tbody>
-            </table>
+            <TableHeader columns={leftColumns} />
           </div>
           <div className={style.tableBody} ref={leftVirtualList}>
             <div
               className={style.virtualListHeight}
               style={{ height: `${totalH}px` }}
             />
-            <div className={style.viewContent}>
-              {dataList.map((item, index) => (
-                <div className={style.viewItem} style={{ position: 'absolute', top: 0, transform: `translate3d(0, ${item.transform}px, 0)` }}>
-                  <TableCell data={item} columns={leftColumns} key={item.id} />
-                </div>
-              ))}
-            </div>
+            <TableRow dataList={dataList} columns={leftColumns} />
           </div>
         </div>
       </div>
       <div className={classnames(style.table, style.mainTable)}>
         <div className={style.tableHeader} ref={virtualHeader}>
-          <table border="1">
-            <tbody>
-              <tr>
-                {columns.map((item) => (
-                  <th
-                    colSpan={item.children ? item.children.length : null}
-                    rowSpan={item.children ? 1 : rowSpan}
-                    key={item.dataIndex}
-                  >
-                    <div
-                      style={{
-                        width: item.children ? null : item.width || 120,
-                      }}
-                    >
-                      {item.title}
-                    </div>
-                  </th>
-                ))}
-              </tr>
-              <tr>
-                {columns.map((item) => {
-                  return item.children ? (
-                    <HeaderCell childColumns={item.children} />
-                  ) : null;
-                })}
-              </tr>
-            </tbody>
-          </table>
+          <TableHeader columns={columns} />
         </div>
         <div className={style.tableBody} ref={virtualList}>
           <div
             className={style.virtualListHeight}
             style={{ height: `${totalH}px` }}
           />
-          <div className={style.viewContent}>
-            {dataList.map((item, index) => (
-              <div className={style.viewItem} style={{ position: 'absolute', top: 0, transform: `translate3d(0, ${item.transform}px, 0)` }}>
-                <TableCell data={item} columns={columns} key={item.id} />
-              </div>
-            ))}
-          </div>
+          <TableRow dataList={dataList} columns={columns} />
         </div>
       </div>
     </div>
-  );
-};
-export default CustomTable;
+  )
+}
+
+export default VirtualTable

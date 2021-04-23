@@ -1,0 +1,29 @@
+.tableHeader {
+    height: 62px;
+    overflow-x: auto;
+    &::-webkit-scrollbar {
+        display: none;
+    }
+    scrollbar-width: none;
+}
+.mainTable{
+    .tableHeader {
+        border-right: 16px solid transparent;
+    }
+}
+.table {
+    border-spacing: 0;
+    border: 1px solid #e8e8e8;
+    th,td{
+        text-align: center;
+        vertical-align: middle;
+        overflow: hidden;
+        word-break: break-all;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        padding: 3px 6px;
+        border: 1px solid #e8e8e8;
+        box-sizing: border-box;
+        height: 30px;
+    }
+}

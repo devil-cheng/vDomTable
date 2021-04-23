@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import VirtualTable from "../components/VirtualTable/index";
+import VirtualTable from "../components/VirtualTables/index";
 import "../assets/index.css";
 
 import data from "../components/data";
@@ -15,7 +15,7 @@ class App extends Component {
         <VirtualTable
           dataSource={data.salaryList}
           columns={data.headList}
-          height={700}
+          height={500}
         />
       </div>
     );

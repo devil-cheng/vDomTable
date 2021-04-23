@@ -10,11 +10,6 @@ export function getRoutes() {
     "path": "/",
     "exact": true,
     "component": require('@/pages/index.js').default
-  },
-  {
-    "path": "/table",
-    "exact": true,
-    "component": require('@/pages/table.js').default
   }
 ];
 
