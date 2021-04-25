@@ -1,6 +1,6 @@
 import style from "./index.less";
 const TableCell = (props) => {
-  const { columns, data } = props;
+  const { columns, data, rowHeight } = props;
 
   return (
     <>
@@ -9,15 +9,18 @@ const TableCell = (props) => {
           <TableCell
             data={data}
             columns={item.children}
-            key={data.index + item.dataIndex + Math.random()}
+            key={data.index + item.dataIndex}
+            rowHeight={rowHeight}
           />
         ) : (
           <div
             className={style.viewItemLi}
-            style={{ width: item.width || 120, textAlign: "center" }}
+            style={{ width: item.width || 120, textAlign: item.align || "left", height: rowHeight, lineHeight: `${rowHeight}px` }}
             key={item.dataIndex + data.id}
           >
-            {data[item.dataIndex]}
+              {
+                !!!item.render ? data[item.dataIndex] :  item.render(data[item.dataIndex], item)
+            }
           </div>
         );
       })}

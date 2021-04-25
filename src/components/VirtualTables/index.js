@@ -7,10 +7,11 @@ import getScrollWidth from "./getScrollWidth";
 
 import style from "./index.less";
 
-const VirtualTable = ({ columns = [], dataSource = [], height, rowHeight = 30 }) => {
+const VirtualTable = ({ columns = [], dataSource = [], height, rowHeight = 50 }) => {
 
   const [scrollBar] = useState(getScrollWidth())
   const [headerHeight, setHeaderHeight] = useState(0)
+  const [ boxShadow={boxShadow}, setBoxShadow] = useState(null)
 
   
   const headerRef = React.createRef();
@@ -32,13 +33,26 @@ const VirtualTable = ({ columns = [], dataSource = [], height, rowHeight = 30 })
     const headerNode = headerRef.current;
     const bodyNode = bodyRef.current;
 
-    const headerScrollFn = () => {
+    headerNode.scrollLeft = 0
+    bodyNode.scrollLeft = 0
+
+    const headerScrollFn = (e) => {
+      if(headerNode.scrollLeft !== 0) {
+        setBoxShadow(true)
+      } else {
+        setBoxShadow(false)
+      }
       if (headerNode.scrollLeft !== bodyNode.scrollLeft) {
         bodyNode.scrollLeft = headerNode.scrollLeft;
       }
     };
 
-    const bodyScrollFn = () => {
+    const bodyScrollFn = (e) => {
+      if(bodyNode.scrollLeft !== 0) {
+        setBoxShadow(true)
+      } else {
+        setBoxShadow(false)
+      }
       if (headerNode.scrollLeft !== bodyNode.scrollLeft) {
         headerNode.scrollLeft = bodyNode.scrollLeft;
       }
@@ -77,9 +91,9 @@ const VirtualTable = ({ columns = [], dataSource = [], height, rowHeight = 30 })
   return (
     <div className={style.container}>
       <div className={style.header} style={{borderRightWidth: scrollBar && scrollBar.scrollBarWidth}}>
-        <CustomHeader columns={columns} scrollBar={scrollBar} ref={headerRef}/>
+        <CustomHeader columns={columns} scrollBar={scrollBar} ref={headerRef} rowHeight={rowHeight} boxShadow={boxShadow}/>
       </div>
-      <CustomTbody columns={columns} dataSource={newDataSource} height={containerHeight} scrollBar={scrollBar} ref={bodyRef}/>
+      <CustomTbody columns={columns} dataSource={newDataSource} height={containerHeight} boxShadow={boxShadow} rowHeight={rowHeight} scrollBar={scrollBar} ref={bodyRef}/>
       {/* <footer>
         脚
       </footer> */}

@@ -3,9 +3,9 @@ import style from "./index.less";
 
 // 头部第二行Cell
 const HeaderCell = ({ columns }) => {
-return columns.map((item) => (
-    <th key={item.dataIndex}>
-        <div style={{ width: item.width || 120 }}>{item.title}</div>
+return columns.map((item, index) => (
+    <th key={new Date()+Math.random()}>
+        <div key={new Date()+Math.random()} style={{ width: item.width || 120, textAlign: item.align || 'left' }}>{item.title}</div>
     </th>
 ));
 };
@@ -25,12 +25,13 @@ const TableHeader = forwardRef(({ columns, height }, ref) => {
                     <th
                     colSpan={item.children ? item.children.length : null}
                     rowSpan={item.children ? 1 : rowSpan}
-                    key={item.dataIndex}
+                    key={new Date()+Math.random()}
                     >
                     <div
                         style={{
-                        width: item.children ? null : item.width || 120,
+                            width: item.children ? null : item.width || 120, textAlign: item.align || 'left'
                         }}
+                        key={new Date()+Math.random()}
                     >
                         {item.title}
                     </div>
@@ -38,9 +39,9 @@ const TableHeader = forwardRef(({ columns, height }, ref) => {
                 ))}
                 </tr>
                 <tr>
-                {columns.map((item) => {
+                {columns.map((item, index) => {
                     return item.children ? (
-                    <HeaderCell columns={item.children} />
+                    <HeaderCell key={new Date()+Math.random()} columns={item.children} />
                     ) : null;
                 })}
                 </tr>

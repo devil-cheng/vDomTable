@@ -1,36 +1,58 @@
 import React, { useMemo, forwardRef, memo, useState } from 'react';
-import { useMount } from "react-use";
+import classnames from 'classnames';
 
 import TableHeader from "./TableHeader";
 import style from './index.less'
 
-const CustomHeader = forwardRef(({ columns }, ref) => {
+const getMaxLevel = (treeData) => {
+  let maxLevel = 0
+  function loop (data, level) {
+    data.forEach(item => {
+      item.level = level
+      if (level > maxLevel) {
+        maxLevel = level
+      }
+      if (item.children && item.children.length > 0) {
+        loop(item.children, level + 1)
+      }
+    })             
+  }
+  loop(treeData, 1)
+  return maxLevel
+}
+
+const CustomHeader = forwardRef(({ columns, rowHeight, boxShadow }, ref) => {
     
     const leftFixedColumns = useMemo(() => {
         return columns.filter(item => item.fixed || item.fixed === 'left')
     }, [columns])
   
-    const [height, setHeight] = useState(null)
   
     const leftFixedRef = React.createRef();
     const headerRef = React.createRef();
+  
+  const height = useMemo(() => {
+    if (leftFixedColumns && leftFixedColumns.length) {
+      const tableLevel = getMaxLevel(columns)
+      const leftLevel = getMaxLevel(leftFixedColumns)
 
-  useMount(() => {
-    if (leftFixedRef.current && headerRef.current && leftFixedRef.current.clientHeight !== headerRef.current.clientHeight) {
-      setHeight(headerRef.current.clientHeight - 2)
+      if (tableLevel !== leftLevel) {
+          return rowHeight * tableLevel
       }
-    })
+    }
+    return getMaxLevel(columns)
+  }, [leftFixedColumns, columns])
 
     return (
         <div className={style.headerContainer} ref={ref}>
             {
                 leftFixedColumns && leftFixedColumns.length !== 0 ? (
-                    <div className={style.leftFixed} ref={leftFixedRef} style={{height: height}}>
-                      <TableHeader columns={leftFixedColumns} height={height} />
+                    <div className={classnames(style.leftFixed, boxShadow ? null : style.hideShadow)} ref={leftFixedRef}>
+                      <TableHeader columns={leftFixedColumns} height={height} rowHeight={rowHeight}/>
                     </div>
                 ) : null
             }
-            <TableHeader ref={headerRef} columns={columns} />
+            <TableHeader ref={headerRef} columns={columns} rowHeight={rowHeight}/>
         </div>
     )
 })

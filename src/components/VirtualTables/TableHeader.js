@@ -2,15 +2,20 @@ import React, { useMemo, forwardRef } from "react";
 import style from "./index.less";
 
 // 头部第二行Cell
-const HeaderCell = ({ columns }) => {
+const HeaderCell = ({ columns, rowHeight }) => {
 return columns.map((item) => (
-    <th key={item.dataIndex}>
-        <div style={{ width: item.width || 120 }}>{item.title}</div>
+    <th key={item.dataIndex} style={{
+        minWidth: item.width || 120,
+        maxWidth: item.width || 120,
+        textAlign: item.align || 'left',
+        height: rowHeight
+    }}>
+        <div>{item.title}</div>
     </th>
 ));
 };
 
-const TableHeader = forwardRef(({ columns, height, borderRight }, ref) => {
+const TableHeader = forwardRef(({ columns, height, rowHeight }, ref) => {
     // 头部行数
   const rowSpan = useMemo(function () {
     const columnsChild = columns.filter((item) => item.children);
@@ -23,15 +28,17 @@ const TableHeader = forwardRef(({ columns, height, borderRight }, ref) => {
                 <tr style={{height: height}}>
                 {columns.map((item) => (
                     <th
-                    colSpan={item.children ? item.children.length : null}
-                    rowSpan={item.children ? 1 : rowSpan}
-                    key={item.dataIndex}
-                    >
-                    <div
+                        colSpan={item.children ? item.children.length : null}
+                        rowSpan={item.children ? 1 : rowSpan}
+                        key={item.dataIndex}
                         style={{
-                        width: item.children ? null : item.width || 120,
+                            minWidth: item.children ? null : item.width || 120,
+                            maxWidth: item.children ? null : item.width || 120,
+                            textAlign: item.children ? 'center' : item.align || 'left',
+                            height: rowHeight
                         }}
                     >
+                        <div>
                         {item.title}
                     </div>
                     </th>
@@ -40,7 +47,7 @@ const TableHeader = forwardRef(({ columns, height, borderRight }, ref) => {
                 <tr>
                 {columns.map((item) => {
                     return item.children ? (
-                    <HeaderCell columns={item.children} />
+                        <HeaderCell key={item.dataIndex} columns={item.children} rowHeight={rowHeight}/>
                     ) : null;
                 })}
                 </tr>

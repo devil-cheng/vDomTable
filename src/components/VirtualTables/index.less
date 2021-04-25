@@ -22,10 +22,10 @@
 .container{
     max-height: 700px;
     overflow: hidden;
-    border: 1px solid #e8e8e8;
+    font-size: 14px;
     .header{
         border-bottom: 1px solid #e8e8e8;
-        border-color: #e8e8e8;
+        border-color: #f8f8f8;
         border-right-style: solid;
         position: relative;
         .headerContainer{
@@ -34,11 +34,16 @@
             .leftFixed{
                 position: absolute;
                 background-color: #fff;
+                box-shadow: 6px 0 6px -4px rgba(0, 0, 0, 15%);
+                &.hideShadow {
+                    box-shadow: none;
+                }
             }
             .table {
                 border-spacing: 0;
-                border: 1px solid #e8e8e8;
+                border: none;
                 border-color: #e8e8e8;
+                border-collapse:collapse;
                 th,td{
                     text-align: center;
                     vertical-align: middle;
@@ -82,6 +87,10 @@
             z-index: 9;
             background-color: #fff;
             border-right: 1px solid #e8e8e8;
+            box-shadow: 6px 0 6px -4px rgba(0, 0, 0, 15%);
+            &.hideShadow {
+                box-shadow: none;
+            }
             .tableBody{
                 overflow-x: hidden;
                 .scrollBarHidden;
