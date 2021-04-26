@@ -39,7 +39,7 @@ const TableHeader = forwardRef(({ columns, height }, ref) => {
                 ))}
                 </tr>
                 <tr>
-                {columns.map((item, index) => {
+                {columns.map((item) => {
                     return item.children ? (
                     <HeaderCell key={new Date()+Math.random()} columns={item.children} />
                     ) : null;

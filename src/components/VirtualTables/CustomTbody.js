@@ -41,7 +41,18 @@ const CustomTbody = forwardRef(({ columns, dataSource, height, scrollBar, rowHei
         setBodyHeight(rowHeight * dataSource.length);
     }, [rowHeight, dataSource]);
   
-  const leftFixedRef = React.createRef();
+    const leftFixedRef = React.createRef();
+    
+    const trHoverFn = (item) => {
+        const list = dataList.map(child => {
+            return {
+                ...child,
+                trHover: item.id === child.id ? true : false
+            }
+        })
+
+        setDataList(list)
+    }
   
 
   const updateViewContentFn = () => {
@@ -114,12 +125,12 @@ const CustomTbody = forwardRef(({ columns, dataSource, height, scrollBar, rowHei
             {
                 leftFixedColumns && leftFixedColumns.length !== 0 ? (
                     <div className={classnames(style.leftFixedTbody, boxShadow ? null : style.hideShadow)} style={{width: leftFixedWidth, bottom: scrollBar.scrollBarHeight }}>
-                        <CustomBodyRow columns={leftFixedColumns} dataSource={dataList} height={height - scrollBar.scrollBarHeight} bodyHeight={bodyHeight} rowHeight={rowHeight} ref={leftFixedRef} />
+                        <CustomBodyRow trHoverFn={trHoverFn} columns={leftFixedColumns} dataSource={dataList} height={height - scrollBar.scrollBarHeight} bodyHeight={bodyHeight} rowHeight={rowHeight} ref={leftFixedRef} />
                    </div>
                ) : null
             }
             <div className={style.tbody}>
-                <CustomBodyRow columns={columns} dataSource={dataList} height={height} bodyHeight={bodyHeight} rowHeight={rowHeight} ref={ref} />
+                <CustomBodyRow trHoverFn={trHoverFn} columns={columns} dataSource={dataList} height={height} bodyHeight={bodyHeight} rowHeight={rowHeight} ref={ref} />
             </div>
         </div>
     )

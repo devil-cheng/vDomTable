@@ -35,6 +35,7 @@
                 position: absolute;
                 background-color: #fff;
                 box-shadow: 6px 0 6px -4px rgba(0, 0, 0, 15%);
+                z-index: 8;
                 &.hideShadow {
                     box-shadow: none;
                 }
@@ -44,6 +45,7 @@
                 border: none;
                 border-color: #e8e8e8;
                 border-collapse:collapse;
+                background: #fafafa;
                 th,td{
                     text-align: center;
                     vertical-align: middle;
@@ -51,10 +53,42 @@
                     word-break: break-all;
                     white-space: nowrap;
                     text-overflow: ellipsis;
-                    padding: 3px 6px;
+                    padding: 3px 16px;
                     border: 1px solid #e8e8e8;
                     box-sizing: border-box;
                     height: 30px;
+                    .sort{
+                        margin-left: 8px;
+                        position: relative;
+                        display: inline-block;
+                        width: 6px;
+                        height: 12px;
+                        vertical-align: middle;
+                        cursor: pointer;
+                        .sortUp, .sortDown{
+                            display: inline-block;
+                            position: absolute;
+                            width: 0;
+                            height: 0;
+                            left: 0;
+                            border-width: 5px 4px 5px 4px;
+                            border-style: dashed;
+                        }
+                        .sortUp{
+                            top: -5px;
+                            border-color: transparent transparent #bfbfbf transparent;
+                            &.on {
+                                border-color: transparent transparent #FFA22D transparent;
+                            }
+                        }
+                        .sortDown{
+                            bottom: -5px;
+                            border-color: #bfbfbf transparent transparent  transparent;
+                            &.on {
+                                border-color: #FFA22D transparent transparent  transparent;
+                            }
+                        }
+                    }
                 }
             }
         }
