@@ -1,8 +1,10 @@
+// 类型判断
 function paramTypeFn(val, type) {
     const result = Object.prototype.toString.call(val).slice(8, -1)
     return type ? type === result : result
 }
 
+// 获取层级
  function getMaxLevel(treeData) {
     let maxLevel = 0
     function loop (data, level) {
@@ -20,28 +22,35 @@ function paramTypeFn(val, type) {
     return maxLevel
 }
 
-function headerSource(treeData) {
+// 扁平化头部数组
+function flatColumns(columns) {
+    return columns.reduce(function (list, column) {
+        list.push(column)
+        if (column.children) {
+            return list.concat(flatColumns(column.children))
+        }
+        return list
+    }, [])
+}
+
+// 头部columns整合
+function convertToColumns(treeData) {
     let maxLevel = 0
-    const list = []
     function loop(data, level) {
         return data.map(item => {
             if (maxLevel < level) {
                 maxLevel = level
             }
             const { children } = item
-            const child = {
+            return {
                 ...item,
                 level,
-                colSpan: children && children.length || 1,
-                rowSpan: level,
                 children: children ? loop(children, level + 1) : null
             }
-            list.push(child)
-            return child
         })            
     }
 
-    loop(treeData, 1)
+    const list = loop(treeData, 1)
     return {
         list: list,
         level: maxLevel
@@ -51,5 +60,6 @@ function headerSource(treeData) {
 export {
     paramTypeFn,
     getMaxLevel,
-    headerSource
+    convertToColumns,
+    flatColumns
 }

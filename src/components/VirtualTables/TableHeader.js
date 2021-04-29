@@ -8,18 +8,18 @@ const HeaderColumns = ({ item, ...otherProps }) => {
         <th
             key={dataIndex}
             style={{
-                minWidth: width || 120,
-                maxWidth: width || 120,
                 textAlign: align,
-                height: height
+                height: height,
+                minWidth: width,
+                maxWidth: width
             }}
             {...otherProps}
         >
             <span>{title}</span>
             {
                 sortable ? (
-                    <span className={style.sort} onClick={() => sortFn(dataIndex, item)}>
-                        <em className={classnames(style.sortUp)}></em>
+                    <span className={style.sort} onClick={() => sortFn(item)}>
+                        <em className={classnames(style.sortUp, style.on)}></em>
                         <em className={classnames(style.sortDown, style.on)}></em>
                     </span>
                 ) : null
@@ -35,6 +35,24 @@ const HeaderCell = ({ columns }) => {
     ));
 };
 
+const Colgroup = ({ columns }) => {
+    return (
+        columns.map(item => {
+            const {width, children, key } = item
+            return children && children.length > 0 ? <Colgroup key={key} columns={children} />  : (
+                <col
+                    key={key}
+                    width={width}
+                    style={{
+                        minWidth: width,
+                        maxWidth: width
+                    }}
+                    />
+            )
+        })
+    )
+}
+
 const TableHeader = forwardRef(({ columns, height }, ref) => {
     // 头部行数
   const rowSpan = useMemo(function () {
@@ -42,9 +60,22 @@ const TableHeader = forwardRef(({ columns, height }, ref) => {
     return columnsChild.length > 0 ? 2 : 1;
   }, [columns])
     
+  const tableWidth = useMemo(function () {
+        const totalWidthFn = (data) => {
+            return data.reduce((total, item) => {
+                const {width, children} = item
+                return total += children && children.length ? totalWidthFn(children) : width
+            }, 0)
+        }
+        return totalWidthFn(columns)
+  }, [columns])
+    
     return (
-        <table border="1" className={style.table} style={{height: height}} ref={ref}>
-            <tbody>
+        <table border="1" className={style.table} style={{ height: height, width: tableWidth }} ref={ref}>
+            <colgroup>
+                <Colgroup columns={columns} />
+            </colgroup>
+            <thead>
                 <tr style={{height: height}}>
                     {columns.map((item) => (
                         <HeaderColumns
@@ -62,7 +93,7 @@ const TableHeader = forwardRef(({ columns, height }, ref) => {
                         ) : null;
                     })}
                 </tr>
-            </tbody>
+            </thead>
         </table>
     )
 })

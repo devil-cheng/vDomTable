@@ -48,7 +48,7 @@ const CustomHeader = forwardRef(({ columns, rowHeight, boxShadow }, ref) => {
             {
                 leftFixedColumns && leftFixedColumns.length !== 0 ? (
                     <div className={classnames(style.leftFixed, boxShadow ? null : style.hideShadow)} ref={leftFixedRef}>
-                      <TableHeader columns={leftFixedColumns} height={height} rowHeight={rowHeight}/>
+                        <TableHeader columns={leftFixedColumns} height={height} rowHeight={rowHeight}/>
                     </div>
                 ) : null
             }

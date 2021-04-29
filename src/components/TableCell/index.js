@@ -1,25 +1,25 @@
 import style from "./index.less";
 const TableCell = (props) => {
-  const { columns, data, rowHeight } = props;
+  const { columns, data } = props;
 
   return (
     <>
       {columns.map((item) => {
-        return item.children ? (
+        const { children, height, width, align, dataIndex, render } = item
+        return children && children.length > 0 ? (
           <TableCell
             data={data}
-            columns={item.children}
-            key={data.index + item.dataIndex}
-            rowHeight={rowHeight}
+            columns={children}
+            key={data.index + dataIndex}
           />
         ) : (
           <div
             className={style.viewItemLi}
-            style={{ width: item.width || 120, textAlign: item.align || "left", height: rowHeight, lineHeight: `${rowHeight}px` }}
-            key={item.dataIndex + data.id}
+            style={{ width: width, minWidth: width, maxWidth: width, textAlign: align, height: height, lineHeight: `${height}px` }}
+            key={dataIndex + data.id}
           >
               {
-                !!!item.render ? data[item.dataIndex] :  item.render(data[item.dataIndex], item)
+                !!!render ? data[dataIndex] :  render(data[dataIndex], item)
             }
           </div>
         );

@@ -20,14 +20,14 @@ function throttle(fn,delay = 60){
 }
 
 const CustomTbody = forwardRef(({ columns, dataSource, height, scrollBar, rowHeight = 30, boxShadow }, ref) => {
-    
+    console.warn(dataSource)
     const leftFixedColumns = useMemo(() => {
         return columns.filter(item => item.fixed || item.fixed === 'left')
     }, [columns])
 
     const leftFixedWidth = useMemo(() => {
         return leftFixedColumns.reduce((total, item) => {
-            total += item.width || 120
+            total += item.width
             return total
         } , 0)
     }, [leftFixedColumns])
@@ -38,7 +38,10 @@ const CustomTbody = forwardRef(({ columns, dataSource, height, scrollBar, rowHei
 
     // 设置滚动区域高度
     useEffect(() => {
-        setBodyHeight(rowHeight * dataSource.length);
+        const bHeight = rowHeight * dataSource.length
+        if (bHeight && bodyHeight !== bHeight) {
+            setBodyHeight(bHeight);
+        }
     }, [rowHeight, dataSource]);
   
     const leftFixedRef = React.createRef();
@@ -125,12 +128,12 @@ const CustomTbody = forwardRef(({ columns, dataSource, height, scrollBar, rowHei
             {
                 leftFixedColumns && leftFixedColumns.length !== 0 ? (
                     <div className={classnames(style.leftFixedTbody, boxShadow ? null : style.hideShadow)} style={{width: leftFixedWidth, bottom: scrollBar.scrollBarHeight }}>
-                        <CustomBodyRow trHoverFn={trHoverFn} columns={leftFixedColumns} dataSource={dataList} height={height - scrollBar.scrollBarHeight} bodyHeight={bodyHeight} rowHeight={rowHeight} ref={leftFixedRef} />
+                        <CustomBodyRow trHoverFn={trHoverFn} columns={leftFixedColumns} dataSource={dataList} height={height - scrollBar.scrollBarHeight} bodyHeight={bodyHeight} ref={leftFixedRef} />
                    </div>
                ) : null
             }
             <div className={style.tbody}>
-                <CustomBodyRow trHoverFn={trHoverFn} columns={columns} dataSource={dataList} height={height} bodyHeight={bodyHeight} rowHeight={rowHeight} ref={ref} />
+                <CustomBodyRow trHoverFn={trHoverFn} columns={columns} dataSource={dataList} height={height} bodyHeight={bodyHeight} ref={ref} />
             </div>
         </div>
     )
